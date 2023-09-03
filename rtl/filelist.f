@@ -1,0 +1,10 @@
+../rtl/butterfly_step1.v
+../rtl/butterfly_stepn_opt.v
+../rtl/cordic_fft_opt.v
+../rtl/fft_ctrl.v
+../rtl/fft_delay.v
+../rtl/fft_stage_n0.v
+../rtl/fft_stage_n1_opt.v
+../rtl/fft_stage_n2_opt.v
+../rtl/fft_top_opt.v
+../rtl/ram2p.v
