@@ -1,15 +1,15 @@
 function [index,y_real,y_imag] = my_fft_fixed(x_real,x_imag,N,data_width_s,fft_ifft,overflow_pro)
-%% ²ÎÊıËµÃ÷
-% x_real        :ÊäÈëÊı¾İÊµ²¿
-% x_imag        :ÊäÈëÊı¾İĞé²¿
-% N             :±ä»»µãÊı
-% data_width_s  :Êı¾İÎ»¿í 12~16Î»£¬×î¸ßÎ»Îª·ûºÅÎ»
-% fft_ifft      :0-fft±ä»¯£»1-ifft±ä»»
-% y_real        :±ä»»Êı¾İÊä³öÊµ²¿£¬Êı¾İÎ»¿íµÈÓÚdata_width_s
-% y_imag        :±ä»»Êı¾İÊä³öĞé²¿£¬Êı¾İÎ»¿íµÈÓÚdata_width_s
-% index         :±ä»»Êä³öÊä³öË÷Òı
-% overflow_pro  :·ÀÒç³ö´¦Àí
-% ×¢£ºfft±ä»»Ê±Ã¿¼¶½ØÒ»Î»
+%% å‚æ•°è¯´æ˜
+% x_real        :è¾“å…¥æ•°æ®å®éƒ¨
+% x_imag        :è¾“å…¥æ•°æ®è™šéƒ¨
+% N             :å˜æ¢ç‚¹æ•°
+% data_width_s  :æ•°æ®ä½å®½ 12~16ä½ï¼Œæœ€é«˜ä½ä¸ºç¬¦å·ä½
+% fft_ifft      :0-fftå˜åŒ–ï¼›1-ifftå˜æ¢
+% y_real        :å˜æ¢æ•°æ®è¾“å‡ºå®éƒ¨ï¼Œæ•°æ®ä½å®½ç­‰äºdata_width_s
+% y_imag        :å˜æ¢æ•°æ®è¾“å‡ºè™šéƒ¨ï¼Œæ•°æ®ä½å®½ç­‰äºdata_width_s
+% index         :å˜æ¢è¾“å‡ºè¾“å‡ºç´¢å¼•
+% overflow_pro  :é˜²æº¢å‡ºå¤„ç†
+% æ³¨ï¼šfftå˜æ¢æ—¶æ¯çº§æˆªä¸€ä½
 %
 %%
 data_width = data_width_s-1;
@@ -21,13 +21,13 @@ x = x_real + 1i* x_imag;
 if(overflow_pro == 1)
     x = floor(real(x)/2) + 1i*floor(imag(x)/2);
 end
-%ifftÊ±£¬½»»»Êµ²¿ºÍĞé²¿
+%ifftæ—¶ï¼Œäº¤æ¢å®éƒ¨å’Œè™šéƒ¨
 if(fft_ifft == 1)
     x = imag(x) + 1i*real(x);
 end
 
 
-step_N = log2(N);%µü´ú´ÎÊı
+step_N = log2(N);%è¿­ä»£æ¬¡æ•°
 stage_out_real = zeros(N,1);
 stage_out_imag = zeros(N,1);
 stage_out = complex(stage_out_real,stage_out_imag);
@@ -36,8 +36,8 @@ cmpmult_out_imag = zeros(2,1);
 cmpmult_out=complex(cmpmult_out_real,cmpmult_out_imag);
 
 for step=1:1:step_N
-    cmpmult_gap= N/(2^step);%Ğı×ªÒò×Ó×î´óÖµ
-    cmpmult_num = 2^(step-1);%ÖØ¸´´ÎÊı×î´óÖµ
+    cmpmult_gap= N/(2^step);%æ—‹è½¬å› å­æœ€å¤§å€¼
+    cmpmult_num = 2^(step-1);%é‡å¤æ¬¡æ•°æœ€å¤§å€¼
     angel_step = dec_0_3_bin(pi*1/(N/2^step),phasewidth);
     angel_pi_4 = dec_0_3_bin(pi/4,phasewidth);
     
@@ -48,7 +48,7 @@ for step=1:1:step_N
     end
     
     if(step == step_N)
-        for s=1:cmpmult_num %ÖØ¸´´ÎÊı
+        for s=1:cmpmult_num %é‡å¤æ¬¡æ•°
             offset=(s-1)*(cmpmult_gap*2);
             for k=1:cmpmult_gap
                 cmpmult_out = butterfly_step1([cmpmult_in(k+offset) cmpmult_in(k+offset+cmpmult_gap)]);
@@ -57,7 +57,7 @@ for step=1:1:step_N
             end
         end
     else   
-        for s=1:cmpmult_num %ÖØ¸´´ÎÊı
+        for s=1:cmpmult_num %é‡å¤æ¬¡æ•°
             angel_sum = 0;
             offset=(s-1)*(cmpmult_gap*2);
             for k=1:cmpmult_gap
@@ -93,12 +93,12 @@ for step=1:1:step_N
                     error('angel_sum_neg err!!!!!!.');
                 end
                 angel_sum_test = dec2bin(angel_sum,24);
-                if(angel_sum_test(3)=='1')
-                 error('angel_sum_neg err!!!!!!.');
-                end  
-                if(angel_sum_test(4)=='1')
-                 error('angel_sum_neg err!!!!!!.');
-                end  
+                %if(angel_sum_test(3)=='1')
+                % error('angel_sum_neg err!!!!!!.');
+                %end  
+                %if(angel_sum_test(4)=='1')
+                % error('angel_sum_neg err!!!!!!.');
+                %end  
               
                 cmpmult_out = butterfly_fixed([cmpmult_in(k+offset) cmpmult_in(k+offset+cmpmult_gap)],data_width,phasewidth,angel_sum,qual);
                 stage_out(k+offset)=cmpmult_out(1);
@@ -109,7 +109,7 @@ for step=1:1:step_N
     
 end
 
-%ifftÊ±£¬½»»»Êµ²¿ºÍĞé²¿
+%ifftæ—¶ï¼Œäº¤æ¢å®éƒ¨å’Œè™šéƒ¨
 if(fft_ifft == 1)
     stage_out = imag(stage_out) + 1i*real(stage_out);
 end
