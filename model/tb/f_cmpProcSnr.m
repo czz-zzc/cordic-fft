@@ -1,36 +1,29 @@
 function [snrProc, errProc, snrProcMin, errProcMax] = f_cmpProcSnr(xSig, xSig0, agcEn, figOn, figNum)
 %***********************************************************************************************************************
-% ÎÄ¼þÃèÊö: ¼ÆËã´¦ÀíÐÅÔë±È, ¿É¼ÆËã¶¨µã»¯ÒýÈëµÄÁ¿»¯ÐÅÔë±È(sqnr: Signal to Quantizing Noise Ratio).
-% ³ÌÐòËµÃ÷£º
-%           1. snr Ô½´ó, ´¦ÀíÎó²îÔ½Ð¡
-%           2. Á¿»¯ÐÅÔë±ÈÔÚ 40 dB ÒÔÉÏÊ±(¶ÔÓ¦´¦ÀíÎó²îÔÚ 1% ÒÔÏÂ), »ù±¾Ã»ÓÐÓ°Ïì
+% æ–‡ä»¶æè¿°: è®¡ç®—å¤„ç†ä¿¡å™ªæ¯”, å¯è®¡ç®—å®šç‚¹åŒ–å¼•å…¥çš„é‡åŒ–ä¿¡å™ªæ¯”(sqnr: Signal to Quantizing Noise Ratio).
+% ç¨‹åºè¯´æ˜Žï¼š
+%           1. snr è¶Šå¤§, å¤„ç†è¯¯å·®è¶Šå°
+%           2. é‡åŒ–ä¿¡å™ªæ¯”åœ¨ 40 dB ä»¥ä¸Šæ—¶(å¯¹åº”å¤„ç†è¯¯å·®åœ¨ 1% ä»¥ä¸‹), åŸºæœ¬æ²¡æœ‰å½±å“
 %***********************************************************************************************************************
-% ÊäÈë:
-%    xSig           : ¾­¹ý´¦ÀíºóµÄÊý¾Ý, ÏòÁ¿»ò¾ØÕó, ¾ØÕóÊ±, Ã¿ÁÐÎªÒ»¸öÐÅºÅ
-%    xSig0          : Ô­Ê¼/ÀíÏëÊý¾Ý, ÏòÁ¿»ò¾ØÕó, ¾ØÕóÊ±, Ã¿ÁÐÎªÒ»¸öÐÅºÅ, Óë xSig Ò»Ò»¶ÔÓ¦
-%    agcEn(¿ÉÑ¡)    : ¶ÔÊý¾Ý½øÐÐ·ù¶Èµ÷Õû, Ä¬ÈÏ²»µ÷Õû. Í¨³£ÔÚ¸¡µãÊý¶Ô±ÈÊ±Ê¹ÓÃ
-%    figOn(¿ÉÑ¡)    : ½«Á½¸öÊý¾Ý»­µ½Ò»ÕÅÍ¼ÉÏ, 0 - ¹Ø±Õ, ÆäËü - ´ò¿ª,  Ä¬ÈÏ¹Ø±Õ.
-%    figNum(¿ÉÑ¡)   : Í¼±àºÅ.
-% Êä³ö:
-%    snrProc        : Îó²îÐÅÔë±È
-%    errProc        : ´¦ÀíÒýÈëµÄÎó²î°Ù·Ö±È, ÀàËÆ evm
-%    snrProcMin     : ×î´óÎó²î¶ÔÓ¦µÄÐÅÔë±È, 
-%    errProcMax     : ×î´óÎó²î 
-%
-%***********************************************************************************************************************
-% ÐÞ¸Ä¼ÇÂ¼:
-%    001    LLW, 2020/5/25, create.
-%    002    LLW, 2020/6/01, Ôö¼Ó´¦ÀíÎó²î°Ù·Ö±ÈÖ¸±ê.
-%    003    LLW, 2021/9/10, Ôö¼Ó×î´óÎó²îÖ¸±ê, »­Í¼Ê¹ÓÃ¹¦ÂÊ¹éÒ»»¯Îó²î(dB Öµ), È¡·´¼´ÎªÃ¿¸öµãµÄÎó²î snr.
-%         
+% è¾“å…¥:
+%    xSig           : ç»è¿‡å¤„ç†åŽçš„æ•°æ®, å‘é‡æˆ–çŸ©é˜µ, çŸ©é˜µæ—¶, æ¯åˆ—ä¸ºä¸€ä¸ªä¿¡å·
+%    xSig0          : åŽŸå§‹/ç†æƒ³æ•°æ®, å‘é‡æˆ–çŸ©é˜µ, çŸ©é˜µæ—¶, æ¯åˆ—ä¸ºä¸€ä¸ªä¿¡å·, ä¸Ž xSig ä¸€ä¸€å¯¹åº”
+%    agcEn(å¯é€‰)    : å¯¹æ•°æ®è¿›è¡Œå¹…åº¦è°ƒæ•´, é»˜è®¤ä¸è°ƒæ•´. é€šå¸¸åœ¨æµ®ç‚¹æ•°å¯¹æ¯”æ—¶ä½¿ç”¨
+%    figOn(å¯é€‰)    : å°†ä¸¤ä¸ªæ•°æ®ç”»åˆ°ä¸€å¼ å›¾ä¸Š, 0 - å…³é—­, å…¶å®ƒ - æ‰“å¼€,  é»˜è®¤å…³é—­.
+%    figNum(å¯é€‰)   : å›¾ç¼–å·.
+% è¾“å‡º:
+%    snrProc        : è¯¯å·®ä¿¡å™ªæ¯”
+%    errProc        : å¤„ç†å¼•å…¥çš„è¯¯å·®ç™¾åˆ†æ¯”, ç±»ä¼¼ evm
+%    snrProcMin     : æœ€å¤§è¯¯å·®å¯¹åº”çš„ä¿¡å™ªæ¯”, 
+%    errProcMax     : æœ€å¤§è¯¯å·®         
 %***********************************************************************************************************************
 % save f_cmpProcSnr
 % load f_cmpProcSnr
 
 % -----------------------------------------------
-% ²ÎÊý¼ì²é¼°Ä¬ÈÏÉèÖÃ
+% å‚æ•°æ£€æŸ¥åŠé»˜è®¤è®¾ç½®
 % -----------------------------------------------
-% Ä¬ÈÏÅäÖÃ
+% é»˜è®¤é…ç½®
 if(~exist('figOn','var') || isempty(figOn))
     figOn = 0; 
 end
@@ -40,55 +33,55 @@ if(~exist('agcEn','var') || isempty(agcEn))
 end
 
 % -----------------------------------------------
-% ³ÌÐòÖ÷Ìå
+% ç¨‹åºä¸»ä½“
 % -----------------------------------------------
 if(agcEn)
     xSig  = f_agc(xSig);
     xSig0 = f_agc(xSig0);
 end
 
-% ´¦ÀíÐÅÔë±È
-snrLine = f_power(xSig0)./f_power(xSig0-xSig); % ÏßÐÔÖµ
-snrProc = 10*log10(snrLine);                   % dB Öµ
+% å¤„ç†ä¿¡å™ªæ¯”
+snrLine = f_power(xSig0)./f_power(xSig0-xSig); % çº¿æ€§å€¼
+snrProc = 10*log10(snrLine);                   % dB å€¼
 errProc = 1./sqrt(snrLine);
 
-% ¼ÆËã×î´óÎó²î(Æ½¾ù¹¦ÂÊ±ÈÉÏ×î´óÎó²î), ¶ÔÓ¦×îÐ¡ÐÅÔë±È
-% snrLineMin = min(abs(xSig0).^2./abs(xSig0-xSig).^2); % ÏßÐÔÖµ, µ± xSig0 È¡0Ê±, ÎÞ·¨ºÜºÃµØ·´Ó³Êµ¼ÊÇé¿ö
-snrLineMin = min(f_power(xSig0)./abs(xSig0-xSig).^2);  % ÏßÐÔÖµ, Ê¹ÓÃ¾ùÖµ¹¦ÂÊ×÷ÎªÐÅºÅ¹¦ÂÊ
-snrProcMin = 10*log10(snrLineMin);                   % dB Öµ
+% è®¡ç®—æœ€å¤§è¯¯å·®(å¹³å‡åŠŸçŽ‡æ¯”ä¸Šæœ€å¤§è¯¯å·®), å¯¹åº”æœ€å°ä¿¡å™ªæ¯”
+% snrLineMin = min(abs(xSig0).^2./abs(xSig0-xSig).^2); % çº¿æ€§å€¼, å½“ xSig0 å–0æ—¶, æ— æ³•å¾ˆå¥½åœ°åæ˜ å®žé™…æƒ…å†µ
+snrLineMin = min(f_power(xSig0)./abs(xSig0-xSig).^2);  % çº¿æ€§å€¼, ä½¿ç”¨å‡å€¼åŠŸçŽ‡ä½œä¸ºä¿¡å·åŠŸçŽ‡
+snrProcMin = 10*log10(snrLineMin);                   % dB å€¼
 errProcMax = 1./sqrt(snrLineMin);
 
-% »­Í¼
+% ç”»å›¾
 if(figOn)
-    % Ä¬ÈÏÅäÖÃ, ÐÂÍ¼
+    % é»˜è®¤é…ç½®, æ–°å›¾
 %     if(~exist('figNum','var') || isempty(figNum))
 %         figNum = []; 
 %     end
     
-    % ¹éÒ»»¯Îó²î
-    err = [xSig-xSig0]./sqrt(f_power(xSig0)); % ¹¦ÂÊ¹éÒ» 
-    f_plotPower(err, [], 0)  % Ïà¶Ô¹¦ÂÊ
-    title(['Îó²î(ÐÅÔë±È¾ùÖµ SNR=' num2str(mean(snrProc), '%.0fdB') ')'])
+    % å½’ä¸€åŒ–è¯¯å·®
+    err = [xSig-xSig0]./sqrt(f_power(xSig0)); % åŠŸçŽ‡å½’ä¸€ 
+    f_plotPower(err, [], 0)  % ç›¸å¯¹åŠŸçŽ‡
+    title(['è¯¯å·®(ä¿¡å™ªæ¯”å‡å€¼ SNR=' num2str(mean(snrProc), '%.0fdB') ')'])
 end
 
 end
 
 %***********************************************************************************************************************
-% ×Óº¯Êý
+% å­å‡½æ•°
 %***********************************************************************************************************************
 function [p] = f_power(x)
-    % ¼ÆËãÄÜÁ¿
+    % è®¡ç®—èƒ½é‡
     p = mean(x.*conj(x));
 end
 
 function xSig = f_agc(xSig)
  
-    % ¼ÆËãÃ¿¸öÐÅºÅÍ³¼ÆÎ»ÖÃÉÏµÄÆ½¾ù¹¦ÂÊ
+    % è®¡ç®—æ¯ä¸ªä¿¡å·ç»Ÿè®¡ä½ç½®ä¸Šçš„å¹³å‡åŠŸçŽ‡
     power = mean(xSig.*conj(xSig));
     
-    % ÐèÒªµ÷ÕûµÄ·ù¶È
+    % éœ€è¦è°ƒæ•´çš„å¹…åº¦
     amp = sqrt(power);
     
-    % µ÷ÕûÐÅºÅ¹¦ÂÊ
+    % è°ƒæ•´ä¿¡å·åŠŸçŽ‡
     xSig = xSig./amp;
 end
